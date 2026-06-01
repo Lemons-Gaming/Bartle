@@ -1,0 +1,10 @@
+# קבצי ביניים של ייצור האומנות (רפרנסים גולמיים ושלבי עבודה) — לא נחוצים לאפליקציה
+assets/ref/
+assets/work/
+
+# כלי בדיקה / זמניים
+.playwright-mcp/
+__pycache__/
+*.pyc
+node_modules/
+*.log
