@@ -6,7 +6,7 @@
 מותאם לקהל חינוכי / נוער.
 
 ## 🕹️ הדגמה חיה
-👉 **https://lemons-gaming.github.io/Bartel/**
+👉 **https://lemons-gaming.github.io/Bartle/**
 
 ## ✨ מה יש בו
 - **12 שאלות תרחיש** בטון נגיש, עם ערבוב סדר התשובות.
