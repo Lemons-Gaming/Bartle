@@ -287,7 +287,43 @@ function PixelImg({ src, className, alt }) {
   );
 }
 
+// מסך מלא — דפדפנים מאפשרים כניסה רק אחרי פעולת משתמש (קליק / מקש)
+const fsSupported = () => !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
+const isFullscreen = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
+const enterFullscreen = () => {
+  const el = document.documentElement;
+  const req = el.requestFullscreen || el.webkitRequestFullscreen;
+  if (req && !isFullscreen()) Promise.resolve(req.call(el)).catch(() => {});
+};
+const exitFullscreen = () => {
+  const ex = document.exitFullscreen || document.webkitExitFullscreen;
+  if (ex && isFullscreen()) Promise.resolve(ex.call(document)).catch(() => {});
+};
+
 function App() {
+  const [fullscreen, setFullscreen] = useState(isFullscreen());
+
+  // כניסה אוטומטית למסך מלא בקליק / הקשה הראשונים בעמוד
+  useEffect(() => {
+    if (!fsSupported()) return;
+    const onFirst = () => {
+      enterFullscreen();
+      document.removeEventListener("click", onFirst);
+      document.removeEventListener("keydown", onFirst);
+    };
+    const onChange = () => setFullscreen(isFullscreen());
+    document.addEventListener("click", onFirst);
+    document.addEventListener("keydown", onFirst);
+    document.addEventListener("fullscreenchange", onChange);
+    document.addEventListener("webkitfullscreenchange", onChange);
+    return () => {
+      document.removeEventListener("click", onFirst);
+      document.removeEventListener("keydown", onFirst);
+      document.removeEventListener("fullscreenchange", onChange);
+      document.removeEventListener("webkitfullscreenchange", onChange);
+    };
+  }, []);
+
   const [gameState, setGameState] = useState("intro"); // intro | playing | loading | result
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [scores, setScores] = useState({ A: 0, E: 0, S: 0, K: 0 });
@@ -330,6 +366,17 @@ function App() {
   return (
     <>
     <style dangerouslySetInnerHTML={{ __html: STYLES }} />
+    {fsSupported() && (
+      <button
+        onClick={(e) => { e.stopPropagation(); fullscreen ? exitFullscreen() : enterFullscreen(); }}
+        className="parchment-btn z-50 text-sm px-3 py-1"
+        style={{ position: "fixed", top: 12, left: 12 }}
+        title={fullscreen ? "יציאה ממסך מלא" : "מסך מלא"}
+        aria-label={fullscreen ? "יציאה ממסך מלא" : "מסך מלא"}
+      >
+        {fullscreen ? "✕ יציאה ממסך מלא" : "⛶ מסך מלא"}
+      </button>
+    )}
     <div dir="rtl" className="min-h-screen flex items-center justify-center p-4 selection:bg-[#d8bc8a]">
       <div className="w-full max-w-2xl parchment-box p-6 md:p-12">
         <div className="nail" style={{ top: 12, left: 12 }}></div>
